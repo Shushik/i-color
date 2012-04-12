@@ -4,7 +4,7 @@
     var
         /**
          * Simple JavaScript library for RGB/HSB/HEX colors based
-         * on John Dyer`s ColorMethods
+         * on John Dyer`s ColorMethods (https://github.com/johndyer)
          *
          * @page    http://github.com/Shushik/i-color/
          * @author  Shushik <silkleopard@yandex.ru>
