@@ -1,0 +1,1 @@
+This color methods library was inspired by John Dyer`s ColorMethods (http://johndyer.name). Actually it`s a kind of refactoring to make the useful OOP-interface and use some modern methologies.
