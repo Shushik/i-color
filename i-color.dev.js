@@ -12,9 +12,9 @@
          *
          * @constructor
          *
-         * @this   {Color}
-         * @param  {Boolean|String|Object}
-         * @return {Color}
+         * @this    {Color}
+         * @param   {Boolean|String|Object}
+         * @returns {Color}
          */
         Color = function(raw) {
             raw = raw || false;
@@ -52,9 +52,9 @@
                 b : 0
             },
             /**
-             * @this   {Color}
-             * @param  {Boolean|String|Object}
-             * @return {Color}
+             * @this    {Color}
+             * @param   {Boolean|String|Object}
+             * @returns {Color}
              */
             init : function(raw) {
                 switch (typeof raw) {
@@ -80,10 +80,10 @@
             /**
              * Validate the given color format
              *
-             * @this   {Color}
-             * @param  {String|Object}
-             * @param  {Boolean|String}
-             * @return {String|Object}
+             * @this    {Color}
+             * @param   {String|Object}
+             * @param   {Boolean|String}
+             * @returns {String|Object}
              */
             validate : function (raw, type) {
                 type = type || 'hex';
@@ -145,9 +145,9 @@
              *
              * @private
              *
-             * @this   {Color}
-             * @param  {Boolean|String}
-             * @return {Object}
+             * @this    {Color}
+             * @param   {Boolean|String}
+             * @returns {Object}
              */
             _hex2rgb : function(raw) {
                 var
@@ -175,9 +175,9 @@
              *
              * @private
              *
-             * @this   {Color}
-             * @param  {Boolean|String}
-             * @return {Object}
+             * @this    {Color}
+             * @param   {Boolean|String}
+             * @returns {Object}
              */
             _hex2hsb : function(raw) {
                 var
@@ -192,9 +192,9 @@
              *
              * @private
              *
-             * @this   {Color}
-             * @param  {Boolean|Object}
-             * @return {Object}
+             * @this    {Color}
+             * @param   {Boolean|Object}
+             * @returns {Object}
              */
             _rgb2hsb : function(raw) {
                 var
@@ -255,9 +255,9 @@
              *
              * @private
              *
-             * @this   {Color}
-             * @param  {Boolean|Object}
-             * @return {String}
+             * @this    {Color}
+             * @param   {Boolean|Object}
+             * @returns {String}
              */
             _rgb2hex : function(raw) {
                 var
@@ -274,9 +274,9 @@
              *
              * @private
              *
-             * @this   {Color}
-             * @param  {Boolean|Object}
-             * @return {Object}
+             * @this    {Color}
+             * @param   {Boolean|Object}
+             * @returns {Object}
              */
             _hsb2rgb : function(raw) {
                 var
@@ -369,9 +369,9 @@
              *
              * @private
              *
-             * @this   {Color}
-             * @param  {Boolean|Object}
-             * @return {String}
+             * @this    {Color}
+             * @param   {Boolean|Object}
+             * @returns {String}
              */
             _hsb2hex : function(raw) {
                 var
@@ -382,13 +382,36 @@
                 return hex;
             },
             /**
+             * Get the type of given color
+             *
+             * @this    {Color}
+             * @param   {String|Object}
+             * @returns {Boolean|String}
+             */
+            type : function(raw) {
+                if (typeof raw == 'object') {
+                    if (!isNaN(raw.r) || !isNaN(raw.g)) {
+                        return 'rgb';
+                    } else if (!isNaN(raw.h) || !isNaN(raw.s)) {
+                        return 'hsb';
+                    }
+                } else if (
+                    typeof raw == 'number' ||
+                    typeof raw == 'string'
+                ) {
+                    return 'hex';
+                }
+
+                return false;
+            },
+            /**
              * Convertation through the color formats
              *
-             * @this   {Color}
-             * @param  {String}
-             * @param  {String}
-             * @param  {Boolean|String|Object}
-             * @return {Color}
+             * @this    {Color}
+             * @param   {String}
+             * @param   {String}
+             * @param   {Boolean|String|Object}
+             * @returns {Color}
              */
             convert : function(from, to, raw) {
                 to   = to   || 'rgb';
@@ -406,12 +429,47 @@
                 return false;
             },
             /**
+             * Invert the given color
+             *
+             * @this    {Color}
+             * @param   {String|Object}
+             * @param   {Boolean|String}
+             * @returns {Color|Object}
+             */
+            invert : function(raw, out) {
+                out = out || false;
+
+                var
+                    type     = Color.prototype.type(raw),
+                    alias    = '',
+                    color    = null,
+                    inverted = {};
+
+                if (!type) {
+                    return false;
+                } else if (type != 'rgb') {
+                    color = Color.prototype['_' + type + '2' + 'rgb'](raw);
+                } else {
+                    color = raw;
+                }
+
+                for (alias in color) {
+                    inverted[alias] = 255 - color[alias];
+                }
+
+                if (out) {
+                    inverted = Color.prototype['_rgb2' + out](inverted);
+                }
+
+                return inverted;
+            },
+            /**
              * Set all color formats from from RGB or get current value
              * of the ._rgb property
              *
-             * @this   {Color}
-             * @param  {Boolean|Object}
-             * @return {Color|Object}
+             * @this    {Color}
+             * @param   {Boolean|Object}
+             * @returns {Color|Object}
              */
             rgb : function(raw) {
                 raw = raw || false;
@@ -435,9 +493,9 @@
              * Set all color formats from from HSB or get current value
              * of the ._hsb property
              *
-             * @this   {Color}
-             * @param  {Boolean|Object}
-             * @return {Color|Object}
+             * @this    {Color}
+             * @param   {Boolean|Object}
+             * @returns {Color|Object}
              */
             hsb : function(raw) {
                 raw = raw || false;
@@ -461,9 +519,9 @@
              * Set all color formats from from HEX or get current value
              * of the ._hex property
              *
-             * @this   {Color}
-             * @param  {Boolean|Object}
-             * @return {Color|String}
+             * @this    {Color}
+             * @param   {Boolean|Object}
+             * @returns {Color|String}
              */
             hex : function(raw) {
                 raw = raw || false;
@@ -489,25 +547,50 @@
          *
          * @static
          *
-         * @this   {Color}
-         * @param  {String}
-         * @param  {String}
-         * @param  {Boolean|String|Object}
-         * @return {String|Object}
+         * @this    {Color}
+         * @param   {String}
+         * @param   {String}
+         * @param   {Boolean|String|Object}
+         * @returns {String|Object}
          */
         Color.convert = Color.prototype.convert;
+
+        /**
+         * Link to Color.prototype.invert for a static usage
+         *
+         * @static
+         *
+         * @this    {Color}
+         * @param   {String}
+         * @param   {String}
+         * @param   {Boolean|String|Object}
+         * @returns {String|Object}
+         */
+        Color.invert = Color.prototype.invert;
 
         /**
          * Link to Color.prototype.convert for a static usage
          *
          * @static
          *
-         * @this   {Color}
-         * @param  {String|Object}
-         * @param  {Boolean|String}
-         * @return {String|Object}
+         * @this    {Color}
+         * @param   {String|Object}
+         * @param   {Boolean|String}
+         * @returns {String|Object}
          */
         Color.validate = Color.prototype.validate;
+
+
+        /**
+         * Link to Color.prototype.type for a static usage
+         *
+         * @static
+         *
+         * @this    {Color}
+         * @param   {String|Object}
+         * @returns {String|Object}
+         */
+        Color.type = Color.prototype.type;
 
 
     // To global namespace
