@@ -14,7 +14,6 @@
          * @constructor
          *
          * @this    {Color}
-         * @this    {Color}
          * @param   {String|Object}
          * @param   {String}
          * @returns {String|Object}
@@ -283,7 +282,6 @@
                         g : 0,
                         b : 0
                     };
-
                 if (raw.length == 3) {
                     rgb.r = parseInt((raw.substring(0, 1) + raw.substring(0, 1)), 16);
                     rgb.g = parseInt((raw.substring(1, 2) + raw.substring(1, 2)), 16);
@@ -956,7 +954,7 @@
              * @param   {String}
              * @returns {String|Object}
              */
-             convert : function(raw, out) {
+            convert : function(raw, out) {
                 out = out || 'rgb';
 
                 var
@@ -973,7 +971,40 @@
                 }
 
                 return false;
-             }
+            },
+            /**
+             * Invert a given color
+             *
+             * @this    {Color}
+             * @param   {String|Object}
+             * @param   {String}
+             * @returns {String|Object}
+             */
+            invert : function(raw, out) {
+                out = out || 'rgb';
+
+                var
+                    loop  = '',
+                    pttp  = Color.prototype,
+                    rgb   = null,
+                    valid = pttp.validate(raw, true);
+
+                if (valid) {
+                    rgb = pttp['_' + valid.type + '2rgb'](valid.raw);
+
+                    for (loop in rgb) {
+                        rgb[loop] = 255 - rgb[loop];
+                    }
+
+                    if (out != 'rgb') {
+                        return pttp['_rgb2' + out](rgb);
+                    }
+
+                    return rgb;
+                }
+
+                return false;
+            }
         };
 
         /**
@@ -982,6 +1013,7 @@
          * @static
          */
         Color.type     = Color.prototype.type;
+        Color.invert   = Color.prototype.invert;
         Color.convert  = Color.prototype.convert;
         Color.validate = Color.prototype.validate;
 
