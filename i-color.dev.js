@@ -4,7 +4,7 @@
 
     var
         /**
-         * Simple JavaScript library for RGB/HSB/HEX/XYZ/LAB colors based
+         * Simple JavaScript library for HEX/RGB/HSB/LAB/XYZ colors based
          * on algorithms from EasyRGB (http://www.easyrgb.com/index.php?X=MATH)
          *
          * @page    http://github.com/Shushik/i-color/
@@ -14,10 +14,13 @@
          * @constructor
          *
          * @this    {Color}
-         * @returns {Color}
+         * @this    {Color}
+         * @param   {String|Object}
+         * @param   {String}
+         * @returns {String|Object}
          */
-        Color = function() {
-            return this;
+        Color = function(raw, out) {
+            return this.convert(raw, out);
         };
 
         Color.prototype = {
@@ -87,27 +90,6 @@
                 b : {
                     min : -128,
                     max : 127
-                }
-            },
-            /**
-             * @private
-             */
-            _cmyk : {
-                c : {
-                    min : 0,
-                    max : 100
-                },
-                m : {
-                    min : 0,
-                    max : 100
-                },
-                y : {
-                    min : 0,
-                    max : 100
-                },
-                k : {
-                    min : 0,
-                    max : 100
                 }
             },
             /**
@@ -339,7 +321,7 @@
              * @param   {String}
              * @returns {Object}
              */
-            _hex2xyz : function(raw) {
+            _hex2lab : function(raw) {
                 var
                     pttp = Color.prototype,
                     xyz  = pttp._hex2xyz(raw);
@@ -1007,6 +989,11 @@
     // Appear in the given namespace
     target.Color = Color;
 
+    var
+        tmp1 = Color.convert('C00'),
+        tmp2 = Color.convert(tmp1, 'cmyk');
+console.log(tmp1);
+console.log(tmp2);
 
 // If you wish to chage context for Color library,
 // change it here
