@@ -1,10 +1,11 @@
 ;(function(target) {
     target = target || window;
 
+
     var
         /**
-         * Simple JavaScript library for RGB/HSB/HEX colors based
-         * on John Dyer`s ColorMethods (https://github.com/johndyer)
+         * Simple JavaScript library for RGB/HSB/HEX/XYZ/LAB colors based
+         * on algorithms from EasyRGB (http://www.easyrgb.com/index.php?X=MATH)
          *
          * @page    http://github.com/Shushik/i-color/
          * @author  Shushik <silkleopard@yandex.ru>
@@ -13,132 +14,276 @@
          * @constructor
          *
          * @this    {Color}
-         * @param   {Boolean|String|Object}
          * @returns {Color}
          */
-        Color = function(raw) {
-            raw = raw || false;
-
-            this.init(raw);
-
+        Color = function() {
             return this;
         };
 
         Color.prototype = {
             /**
-             * HEX format of color set by .hex() method
-             *
-             * @private
-             */
-            _hex : '000000',
-            /**
-             * RGB format of color set by .rgb() method
-             *
              * @private
              */
             _rgb : {
-                r : 0,
-                g : 0,
-                b : 0
+                r : {
+                    min : 0,
+                    max : 255
+                },
+                g : {
+                    min : 0,
+                    max : 255
+                },
+                b : {
+                    min : 0,
+                    max : 255
+                }
             },
             /**
-             * HSB format of color set by .hsb() method
-             *
              * @private
              */
-            _hsb : {
-                h : 0,
-                s : 0,
-                b : 0
-            },
-            /**
-             * @this    {Color}
-             * @param   {Boolean|String|Object}
-             * @returns {Color}
-             */
-            init : function(raw) {
-                switch (typeof raw) {
-
-                    // The hex color given
-                    case 'string':
-                        this.hex(raw);
-                    break;
-
-                    // The rgb or the hsb color given
-                    case 'object':
-                        if (raw.r || raw.g) {
-                            this.rgb(raw);
-                        } else if (raw.h || raw.s) {
-                            raw.hsb(raw);
-                        }
-                    break;
-
+            _hsv : {
+                h : {
+                    min : 0,
+                    max : 359
+                },
+                s : {
+                    min : 0,
+                    max : 100
+                },
+                v : {
+                    min : 0,
+                    max : 100
                 }
-
-                return this;
             },
             /**
-             * Validate the given color format
+             * @private
+             */
+            _xyz : {
+                x : {
+                    min : 0,
+                    max : 95.047
+                },
+                y : {
+                    min : 0,
+                    max : 100
+                },
+                z : {
+                    min : 0,
+                    max : 108.883
+                }
+            },
+            /**
+             * @private
+             */
+            _lab : {
+                l : {
+                    min : 0,
+                    max : 100
+                },
+                a : {
+                    min : -128,
+                    max : 127
+                },
+                b : {
+                    min : -128,
+                    max : 127
+                }
+            },
+            /**
+             * @private
+             */
+            _cmyk : {
+                c : {
+                    min : 0,
+                    max : 100
+                },
+                m : {
+                    min : 0,
+                    max : 100
+                },
+                y : {
+                    min : 0,
+                    max : 100
+                },
+                k : {
+                    min : 0,
+                    max : 100
+                }
+            },
+            /**
+             * @private
+             */
+            _white : {
+                x : 95.047,
+                y : 100.000,
+                z : 108.883
+            },
+            /**
+             * @private
+             */
+            _human : {
+                'red'                  : 'FF0000',
+                'tan'                  : 'D2B48C',
+                'aqua'                 : '00FFFF',
+                'blue'                 : '0000FF',
+                'cyan'                 : '00FFFF',
+                'gold'                 : 'FFD700',
+                'gray'                 : '808080',
+                'lime'                 : '00FF00',
+                'navy'                 : '000080',
+                'peru'                 : 'CD853F',
+                'pink'                 : 'FFC0CB',
+                'plum'                 : 'DDA0DD',
+                'snow'                 : 'FFFAFA',
+                'teal'                 : '008080',
+                'azure'                : 'F0FFFF',
+                'beige'                : 'F5F5DC',
+                'black'                : '000000',
+                'brown'                : 'A52A2A',
+                'coral'                : 'FF7F50',
+                'green'                : '008000',
+                'ivory'                : 'FFFFF0',
+                'khaki'                : 'F0E68C',
+                'linen'                : 'FAF0E6',
+                'olive'                : '808000',
+                'wheat'                : 'F5DEB3',
+                'white'                : 'FFFFFF',
+                'bisque'               : 'FFE4C4',
+                'indigo'               : '4B0082',
+                'maroon'               : '800000',
+                'orange'               : 'FFA500',
+                'orchid'               : 'DA70D6',
+                'purple'               : '800080',
+                'salmon'               : 'FA8072',
+                'sienna'               : 'A0522D',
+                'silver'               : 'C0C0C0',
+                'tomato'               : 'FF6347',
+                'violet'               : 'EE82EE',
+                'yellow'               : 'FFFF00',
+                'crimson'              : 'DC143C',
+                'darkred'              : '8B0000',
+                'dimgray'              : '696969',
+                'fuchsia'              : 'FF00FF',
+                'hotpink'              : 'FF69B4',
+                'magenta'              : 'FF00FF',
+                'oldlace'              : 'FDF5E6',
+                'skyblue'              : '87CEEB',
+                'thistle'              : 'D8BFD8',
+                'cornsilk'             : 'FFF8DC',
+                'darkblue'             : '00008B',
+                'darkcyan'             : '008B8B',
+                'darkgray'             : 'A9A9A9',
+                'deeppink'             : 'FF1493',
+                'honeydew'             : 'F0FFF0',
+                'lavender'             : 'E6E6FA',
+                'moccasin'             : 'FFE4B5',
+                'seagreen'             : '2E8B57',
+                'seashell'             : 'FFF5EE',
+                'aliceblue'            : 'F0F8FF',
+                'burlywood'            : 'DEB887',
+                'cadetblue'            : '5F9EA0',
+                'chocolate'            : 'D2691E',
+                'darkgreen'            : '006400',
+                'darkkhaki'            : 'BDB76B',
+                'firebrick'            : 'B22222',
+                'gainsboro'            : 'DCDCDC',
+                'goldenrod'            : 'DAA520',
+                'indianred'            : 'CD5C5C',
+                'lawngreen'            : '7CFC00',
+                'lightblue'            : 'ADD8E6',
+                'lightcyan'            : 'E0FFFF',
+                'lightgrey'            : 'D3D3D3',
+                'lightpink'            : 'FFB6C1',
+                'limegreen'            : '32CD32',
+                'mintcream'            : 'F5FFFA',
+                'mistyrose'            : 'FFE4E1',
+                'olivedrab'            : '6B8E23',
+                'orangered'            : 'FF4500',
+                'palegreen'            : '98FB98',
+                'peachpuff'            : 'FFDAD9',
+                'rosybrown'            : 'BC8F8F',
+                'royalblue'            : '4169E1',
+                'slateblue'            : '6A5ACD',
+                'slategray'            : '708090',
+                'steelblue'            : '4682B4',
+                'turquoise'            : '40E0D0',
+                'aquamarine'           : '7FFFD4',
+                'blueviolet'           : '8A2BE2',
+                'chartreuse'           : '7FFF00',
+                'darkorange'           : 'FF8C00',
+                'darkorchid'           : '9932CC',
+                'darksalmon'           : 'E9967A',
+                'darkviolet'           : '9400D3',
+                'dodgerblue'           : '1E90FF',
+                'ghostwhite'           : 'F8F8FF',
+                'lightcoral'           : 'F08080',
+                'lightgreen'           : '90EE90',
+                'mediumblue'           : '0000CD',
+                'papayawhip'           : 'FFEFD5',
+                'powderblue'           : 'B0E0E6',
+                'sandybrown'           : 'F4A460',
+                'whitesmoke'           : 'F5F5F5',
+                'floralwhite'          : 'FFFAF0',
+                'forestgreen'          : '228B22',
+                'darkmagenta'          : '8B008B',
+                'deepskyblue'          : '00BFFF',
+                'navajowhite'          : 'FFDEAD',
+                'yellowgreen'          : '9ACD32',
+                'greenyellow'          : 'ADFF2F',
+                'lightsalmon'          : 'FFA07A',
+                'lightyellow'          : 'FFFFE0',
+                'saddlebrown'          : '8B4513',
+                'springgreen'          : '00FF7F',
+                'darkseagreen'         : '8FBC8F',
+                'antiquewhite'         : 'FAEBD7',
+                'lemonchiffon'         : 'FFFACD',
+                'lightskyblue'         : '87CEFA',
+                'mediumorchid'         : 'BA55D3',
+                'mediumpurple'         : '9370D8',
+                'midnightblue'         : '191970',
+                'darkslateblue'        : '483D8B',
+                'darkslategray'        : '2F4F4F',
+                'darkturquoise'        : '00CED1',
+                'darkgoldenrod'        : 'B8860B',
+                'lavenderblush'        : 'FFF0F5',
+                'lightseagreen'        : '20B2AA',
+                'palegoldenrod'        : 'EEE8AA',
+                'paleturquoise'        : 'AFEEEE',
+                'palevioletred'        : 'D87093',
+                'blanchedalmond'       : 'FFEBCD',
+                'cornflowerblue'       : '6495ED',
+                'darkolivegreen'       : '556B2F',
+                'lightslategray'       : '778899',
+                'lightsteelblue'       : 'B0C4DE',
+                'mediumseagreen'       : '3CB371',
+                'mediumslateblue'      : '7B68EE',
+                'mediumturquoise'      : '48D1CC',
+                'mediumvioletred'      : 'C71585',
+                'mediumaquamarine'     : '66CDAA',
+                'mediumspringgreen'    : '00FA9A',
+                'lightgoldenrodyellow' : 'FAFAD2'
+            },
+            /**
+             * Instead of nonworking Math.toFixed()
+             *
+             * @private
              *
              * @this    {Color}
-             * @param   {String|Object}
-             * @param   {Boolean|String}
-             * @returns {String|Object}
+             * @param   {Number}
+             * @param   {Number}
+             * @returns {Number}
              */
-            validate : function (raw, type) {
-                type = type || 'hex';
+            _round : function(num, after) {
+                after = after || 3;
 
                 var
-                    pos    = 0,
-                    origin = Color.prototype['_' + type];
+                    reg = new RegExp('^([-\\d]*)(\\.\\d{1,' + after + '})?.*');
 
-                switch (type) {
+                num += '';
+                num = num.replace(reg, '$1$2');
+                num -= 0;
 
-                    case 'rgb':
-                    case 'hsb':
-                        for (pos in origin) {
-                            raw[pos] -= 0;
-
-                            if (!raw[pos] || isNaN(raw[pos]) || raw[pos] < 0) {
-                                raw[pos] = 0;
-                            }
-
-                            raw[pos] = Math.floor(raw[pos]);
-
-                            if (pos == 'r' || pos == 'g' || type == 'rgb' && pos == 'b') {
-                                if (raw[pos] > 255) {
-                                    raw[pos] = 255;
-                                }
-                            } else if (pos == 'h' || pos == 's') {
-                                if (raw[pos] > 100) {
-                                    raw[pos] = 100;
-                                }
-                            } else if (type == 'hsb' && pos == 'b') {
-                                if (raw[pos] >= 360 || raw[pos] < 0) {
-                                    raw[pos] = 0;
-                                }
-                            }
-                        }
-                    break;
-
-                    case 'hex':
-                        raw = ('' + raw)
-                              .toUpperCase()
-                              .replace(/[^A-F0-9]/g, '0');
-                        pos = raw.length;
-
-                        if (pos < 6 && pos > 3) {
-                            raw += ('000000').substring(pos, 6 - pos);
-                        } else if (pos < 6 && pos < 3) {
-                            raw += ('000').substring(pos, 3 - pos);
-                        } else if (pos > 6) {
-                            raw = raw.substring(0, 6);
-                        }
-                    break;
-
-                }
-
-                return raw;
+                return num;
             },
             /**
              * HEX to RGB convertation
@@ -146,69 +291,98 @@
              * @private
              *
              * @this    {Color}
-             * @param   {Boolean|String}
+             * @param   {String}
              * @returns {Object}
              */
             _hex2rgb : function(raw) {
                 var
-                    hex = raw ? raw : this._hex,
                     rgb = {
                         r : 0,
                         g : 0,
                         b : 0
                     };
 
-                if (hex.length == 3) {
-                    rgb.r = parseInt(hex.substring(0, 1), 16);
-                    rgb.r = parseInt(hex.substring(1, 1), 16);
-                    rgb.r = parseInt(hex.substring(2, 1), 16);
+                if (raw.length == 3) {
+                    rgb.r = parseInt((raw.substring(0, 1) + raw.substring(0, 1)), 16);
+                    rgb.g = parseInt((raw.substring(1, 2) + raw.substring(1, 2)), 16);
+                    rgb.b = parseInt((raw.substring(2, 3) + raw.substring(2, 3)), 16);
                 } else {
-                    rgb.r = parseInt(hex.substring(0, 2), 16);
-                    rgb.r = parseInt(hex.substring(2, 2), 16);
-                    rgb.r = parseInt(hex.substring(4, 2), 16);
+                    rgb.r = parseInt(raw.substring(0, 2), 16);
+                    rgb.g = parseInt(raw.substring(2, 4), 16);
+                    rgb.b = parseInt(raw.substring(4, 6), 16);
                 }
 
                 return rgb;
             },
             /**
-             * HEX to HSB convertation
+             * HEX to HSV convertation
              *
              * @private
              *
              * @this    {Color}
-             * @param   {Boolean|String}
+             * @param   {String}
              * @returns {Object}
              */
-            _hex2hsb : function(raw) {
+            _hex2hsv : function(raw) {
                 var
-                    hex = raw ? raw : this._hex,
-                    rgb = Color.prototype._hex2rgb(hex),
-                    hsb = Color.prototype._rgb2hsb(rgb);
+                    pttp = Color.prototype,
+                    rgb  = pttp._hex2rgb(raw);
 
-                return hsb;
+                return pttp._rgb2hsv(rgb);
             },
             /**
-             * RGB to HSB convertation
+             * HEX to LAB convertation
              *
              * @private
              *
              * @this    {Color}
-             * @param   {Boolean|Object}
+             * @param   {String}
              * @returns {Object}
              */
-            _rgb2hsb : function(raw) {
+            _hex2xyz : function(raw) {
                 var
-                    rgb   = raw ? raw : this._rgb,
-                    r     = rgb.r / 255,
-                    g     = rgb.g / 255,
-                    b     = rgb.b / 255,
+                    pttp = Color.prototype,
+                    xyz  = pttp._hex2xyz(raw);
+
+                return pttp._xyz2lab(xyz);
+            },
+            /**
+             * HEX to XYZ convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {String}
+             * @returns {Object}
+             */
+            _hex2xyz : function(raw) {
+                var
+                    pttp = Color.prototype,
+                    rgb  = pttp._hex2rgb(raw);
+
+                return pttp._rgb2xyz(rgb);
+            },
+            /**
+             * RGB to HSV convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {Object}
+             * @returns {Object}
+             */
+            _rgb2hsv : function(raw) {
+                var
+                    r     = raw.r / 255,
+                    g     = raw.g / 255,
+                    b     = raw.b / 255,
                     min   = 0,
                     max   = 0,
                     delta = 0,
-                    hsb   = {
+                    hsv   = {
                         h : 0,
                         s : 0,
-                        b : 0
+                        v : 0
                     };
 
                 if (r >= g && r >= g) {
@@ -222,33 +396,91 @@
                     min = g > r ? r : g;
                 }
 
-                hsb.b = max;
-                hsb.s = (max) ? ((max - min) / max) : 0;
+                hsv.v = max;
+                hsv.s = (max) ? ((max - min) / max) : 0;
 
-                if (!hsb.s) {
-                    hsb.h = 0;
+                if (!hsv.s) {
+                    hsv.h = 0;
                 } else {
                     delta = max - min;
 
                     if (r == max) {
-                        hsb.h = (g - b) / delta;
+                        hsv.h = (g - b) / delta;
                     } else if (g == max) {
-                        hsb.h = 2 + (b - r) / delta;
+                        hsv.h = 2 + (b - r) / delta;
                     } else {
-                        hsb.h = 4 + (r - g) / delta;
+                        hsv.h = 4 + (r - g) / delta;
                     }
 
-                    hsb.h = parseInt(hsb.h * 60);
+                    hsv.h = parseInt(hsv.h * 60);
 
-                    if (hsb.h < 0) {
-                        hsb.h += 360;
+                    if (hsv.v < 0) {
+                        hsv.v += 360;
                     }
                 }
 
-                hsb.s = parseInt(hsb.s * 100);
-                hsb.b = parseInt(hsb.b * 100);
+                hsv.s = parseInt(hsv.s * 100);
+                hsv.v = parseInt(hsv.v * 100);
 
-                return hsb;
+                return hsv;
+            },
+            /**
+             * RGB to LAB convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {Object}
+             * @returns {Object}
+             */
+            _rgb2lab : function(raw) {
+                var
+                    pttp = Color.prototype,
+                    xyz  = pttp._rgb2xyz(raw);
+
+                return pttp._xyz2lab(xyz);
+            },
+            /**
+             * RGB to XYZ convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {Object}
+             * @returns {Object}
+             */
+            _rgb2xyz : function(raw) {
+                var
+                    tmp  = '',
+                    loop = '',
+                    rgb  = {
+                        r : raw.r / 255,
+                        g : raw.g / 255,
+                        b : raw.b / 255
+                    },
+                    xyz  = null;
+
+                for (loop in rgb) {
+                    if (rgb[loop] > 0.04045) {
+                        rgb[loop] = Math.pow(((rgb[loop] + 0.055) / 1.055), 2.4);
+                    } else {
+                        rgb[loop] /= 12.92;
+                    }
+
+                    rgb[loop] = rgb[loop] * 100;
+                }
+
+                xyz = {
+                    x : rgb.r * 0.4124 + rgb.g * 0.3576 + rgb.b * 0.1805,
+                    y : rgb.r * 0.2126 + rgb.g * 0.7152 + rgb.b * 0.0722,
+                    z : rgb.r * 0.0193 + rgb.g * 0.1192 + rgb.b * 0.9505
+                };
+
+                for (loop in xyz) {
+                    xyz[loop] = Color.prototype._round(xyz[loop]);
+                }
+
+                return xyz;
             },
             /**
              * RGB to HEX convertation
@@ -256,39 +488,45 @@
              * @private
              *
              * @this    {Color}
-             * @param   {Boolean|Object}
+             * @param   {Object}
              * @returns {String}
              */
             _rgb2hex : function(raw) {
                 var
-                    rgb = raw ? raw : this._rgb;
+                    loop = '',
+                    tmp  = {};
 
-                return (
-                    rgb.r.toString(16) +
-                    rgb.g.toString(16) +
-                    rgb.b.toString(16)
-                );
+                    tmp.r = raw.r.toString(16),
+                    tmp.g = raw.g.toString(16),
+                    tmp.b = raw.b.toString(16);
+
+                for (loop in tmp) {
+                    if (tmp[loop].length < 2) {
+                        tmp[loop] += tmp[loop];
+                    }
+                }
+
+                return tmp.r + tmp.g + tmp.b;
             },
             /**
-             * HSB to RGB convertation
+             * HSV to RGB convertation
              *
              * @private
              *
              * @this    {Color}
-             * @param   {Boolean|Object}
+             * @param   {Object}
              * @returns {Object}
              */
-            _hsb2rgb : function(raw) {
+            _hsv2rgb : function(raw) {
                 var
-                    hsb = raw ? raw : this._hsb,
                     i   = 0,
                     f   = 0,
                     p   = 0,
                     q   = 0,
                     t   = 0,
-                    h   = hsb.h,
-                    s   = hsb.s,
-                    b   = hsb.b,
+                    h   = raw.h,
+                    s   = raw.s,
+                    v   = raw.v,
                     rgb = {
                         r : 0,
                         g : 0,
@@ -309,48 +547,48 @@
                     h /= 60;
 
                     s = s / 100;
-                    b = b / 100;
+                    v = v / 100;
 
                     i = parseInt(h);
                     f = h - i;
-                    p = b * (1 - s);
-                    q = b * (1 - (s * f));
-                    t = b * (1 - (s * (1 - f)));
+                    p = v * (1 - s);
+                    q = v * (1 - (s * f));
+                    t = v * (1 - (s * (1 - f)));
 
                     switch (i) {
 
                         case 0:
-                            rgb.r = b;
+                            rgb.r = v;
                             rgb.g = t;
                             rgb.b = p;
                         break;
 
                         case 1:
                             rgb.r = q;
-                            rgb.g = b;
+                            rgb.g = v;
                             rgb.b = p;
                         break;
 
                         case 2:
                             rgb.r = p;
-                            rgb.g = b;
+                            rgb.g = v;
                             rgb.b = t;
                         break;
 
                         case 3:
                             rgb.r = p;
                             rgb.g = q;
-                            rgb.b = b;
+                            rgb.b = v;
                         break;
 
                         case 4:
                             rgb.r = t;
                             rgb.g = p;
-                            rgb.b = b;
+                            rgb.b = v;
                         break;
 
                         case 5:
-                            rgb.r = b;
+                            rgb.r = v;
                             rgb.g = p;
                             rgb.b = q;
                         break;
@@ -365,238 +603,411 @@
                 return rgb;
             },
             /**
-             * HSB to HEX convertation
+             * HSV to LAB convertation
              *
              * @private
              *
              * @this    {Color}
-             * @param   {Boolean|Object}
-             * @returns {String}
+             * @param   {Object}
+             * @returns {Object}
              */
-            _hsb2hex : function(raw) {
+            _hsv2lab : function(raw) {
                 var
-                    hsb = raw ? raw : this._hsb;
-                    rgb = Color.prototype._hsb2rgb(hsb),
-                    hex = Color.prototype._rgb2hex(rgb);
+                    pttp = Color.prototype,
+                    xyz  = pttp._hsv2xyz(raw);
 
-                return hex;
+                return pttp._xyz2lab(xyz);
             },
             /**
-             * Get the type of given color
+             * HSV to XYZ convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {Object}
+             * @returns {Object}
+             */
+            _hsv2xyz : function(raw) {
+                var
+                    pttp = Color.prototype,
+                    rgb  = pttp._hsv2rgb(raw);
+
+                return pttp._rgb2xyz(rgb);
+            },
+            /**
+             * HSV to HEX convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {Object}
+             * @returns {String}
+             */
+            _hsv2hex : function(raw) {
+                var
+                    pttp = Color.prototype,
+                    rgb  = pttp._hsv2rgb(raw);
+
+                return pttp._rgb2hex(rgb);
+            },
+            /**
+             * LAB to RGB convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {Object}
+             * @returns {Object}
+             */
+            _lab2rgb : function(raw) {
+                var
+                    pttp = Color.prototype,
+                    xyz  = pttp._lab2xyz(raw);
+
+                return pttp._xyz2rgb(xyz);
+            },
+            /**
+             * LAB to RGB convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {Object}
+             * @returns {Object}
+             */
+            _lab2hsv : function(raw) {
+                var
+                    pttp = Color.prototype,
+                    rgb  = pttp._lab2rgb(raw);
+
+                return pttp._rgb2hsv(rgb);
+            },
+            /**
+             * LAB to XYZ convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {Object}
+             * @returns {Object}
+             */
+            _lab2xyz : function(raw) {
+                var
+                    loop  = '',
+                    powed = 0,
+                    xyz   = {},
+                    pttp  = Color.prototype,
+                    white = pttp._white;
+
+                xyz.y = (raw.l + 16) / 116;
+                xyz.x = raw.a / 500 + xyz.y;
+                xyz.z = xyz.y - raw.b / 200;
+
+                for (loop in xyz) {
+                    powed = Math.pow(xyz[loop], 3);
+
+                    if (powed > 0.008856) {
+                        xyz[loop] = powed;
+                    } else {
+                        xyz[loop] = (xyz[loop] - 16 / 116 ) / 7.787;
+                    }
+
+                    xyz[loop] = pttp._round(xyz[loop] * white[loop]);
+                }
+
+                return {
+                    x : xyz.x,
+                    y : xyz.y,
+                    z : xyz.z
+                };
+            },
+            /**
+             * LAB to HEX convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {Object}
+             * @returns {String}
+             */
+            _lab2hex : function(raw) {
+                var
+                    pttp = Color.prototype,
+                    rgb  = pttp._lab2rgb(raw);
+
+                return pttp._rgb2hex(rgb);
+            },
+            /**
+             * XYZ to RGB convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {Object}
+             * @returns {Object}
+             */
+            _xyz2rgb : function(raw) {
+                var
+                    loop = '',
+                    xyz  = {
+                        x : raw.x / 100,
+                        y : raw.y / 100,
+                        z : raw.z / 100
+                    },
+                    rgb  = {};
+
+                rgb.r = xyz.x * 3.2406 + xyz.y * -1.5372 + xyz.z * -0.4986;
+                rgb.g = xyz.x * -0.9689 + xyz.y * 1.8758 + xyz.z * 0.0415;
+                rgb.b = xyz.x * 0.0557 + xyz.y * -0.2040 + xyz.z * 1.0570;
+
+                for (loop in rgb) {
+                    rgb[loop] = Color.prototype._round(rgb[loop]);
+
+                    if (rgb[loop] > 0.0031308) {
+                        rgb[loop] = 1.055 * Math.pow(rgb[loop], (1 / 2.4)) - 0.055;
+                    } else {
+                        rgb[loop] *= 12.92;
+                    }
+
+                    rgb[loop] = Math.round(rgb[loop] * 255);
+                }
+
+                return rgb;
+            },
+            /**
+             * XYZ to HSV convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {Object}
+             * @returns {Object}
+             */
+            _xyz2hsv : function(raw) {
+                var
+                    pttp = Color.prototype,
+                    rgb  = pttp._xyz2rgb(raw);
+
+                return pttp._rgb2hsv(rgb);
+            },
+            /**
+             * XYZ to LAB convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {Object}
+             * @returns {Object}
+             */
+            _xyz2lab : function(raw) {
+                var
+                    loop  = '',
+                    xyz   = {},
+                    white = Color.prototype._white;
+
+                for (loop in raw) {
+                    xyz[loop] = raw[loop] / white[loop];
+
+                    if (xyz[loop] > 0.008856) {
+                        xyz[loop] = Math.pow(xyz[loop], 1 / 3);
+                    } else {
+                        xyz[loop] = (7.787 * xyz[loop]) + (16 / 116);
+                    }
+                }
+
+                return {
+                    l : 116 * xyz.y - 16,
+                    a : 500 * (xyz.x - xyz.y),
+                    b : 200 * (xyz.y - xyz.z)
+                };
+            },
+            /**
+             * XYZ to HEX convertation
+             *
+             * @private
+             *
+             * @this    {Color}
+             * @param   {Object}
+             * @returns {String}
+             */
+            _xyz2hex : function(raw) {
+                var
+                    pttp = Color.prototype,
+                    rgb  = pttp._xyz2rgb(raw);
+
+                return pttp._rgb2hex(rgb);
+            },
+            /**
+             * Get a type of the given color
              *
              * @this    {Color}
              * @param   {String|Object}
              * @returns {Boolean|String}
              */
             type : function(raw) {
+                var
+                    loop  = '',
+                    check = '';
+
                 if (typeof raw == 'object') {
+                    for (loop in raw) {
+                        raw[loop] -= 0;
+                    }
+
                     if (!isNaN(raw.r) || !isNaN(raw.g)) {
                         return 'rgb';
                     } else if (!isNaN(raw.h) || !isNaN(raw.s)) {
-                        return 'hsb';
+                        return 'hsv';
+                    } else if (!isNaN(raw.x) ||!isNaN(raw.z)) {
+                        return 'xyz';
+                    } else if (!isNaN(raw.l) || !isNaN(raw.a)) {
+                        return 'lab';
+                    } else if (!isNaN(raw.c) || !isNaN(raw.m) || !isNaN(raw.k)) {
+                        return 'cmyk';
                     }
                 } else if (
                     typeof raw == 'number' ||
                     typeof raw == 'string'
                 ) {
-                    return 'hex';
+                    check = raw.substring(0, 4);
+
+                    if (check == 'rgb(' || check == 'rgba') {
+                        return 'css';
+                    } else {
+                        return 'hex';
+                    }
                 }
 
                 return false;
             },
             /**
-             * Convertation through the color formats
-             *
-             * @this    {Color}
-             * @param   {String}
-             * @param   {String}
-             * @param   {Boolean|String|Object}
-             * @returns {Color}
-             */
-            convert : function(from, to, raw) {
-                to   = to   || 'rgb';
-                raw  = raw  || false;
-                from = from || 'hex';
-
-                var
-                    alias = '_' + from + '2' + to;
-
-                //
-                if (Color.prototype[alias]) {
-                    return Color.prototype[alias](raw);
-                }
-
-                return false;
-            },
-            /**
-             * Invert the given color
+             * Validate the given color
              *
              * @this    {Color}
              * @param   {String|Object}
-             * @param   {Boolean|String}
-             * @returns {Color|Object}
+             * @param   {Boolean}
+             * @returns {Boolean|Object}
              */
-            invert : function(raw, out) {
-                out = out || false;
+            validate : function(raw, object) {
+                object = object || false;
 
                 var
-                    type     = Color.prototype.type(raw),
-                    alias    = '',
-                    color    = null,
-                    inverted = {};
+                    pttp   = Color.prototype,
+                    type   = pttp.type(raw),
+                    loop   = '',
+                    check  = '',
+                    tmp    = null,
+                    origin = null;
 
-                if (!type) {
-                    return false;
-                } else if (type != 'rgb') {
-                    color = Color.prototype['_' + type + '2' + 'rgb'](raw);
-                } else {
-                    color = raw;
+                if (type) {
+                    if (type == 'css') {
+                        origin = pttp._rgb;
+                        type   = 'rgb';
+                        tmp    = raw.replace(/rgb(a)?\(|\)/g, '').split(/,\s?/);
+                        raw    = {r : tmp[0], g : tmp[1], b : tmp[2]};
+                    } else {
+                        origin = pttp['_' + type];
+                    }
+
+                    switch (type) {
+
+                        case 'css':
+                        case 'rgb':
+                        case 'hsv':
+                        case 'lab':
+                        case 'xyz':
+                        case 'cmyk':
+                            for (loop in origin) {
+                                if (!raw[loop] || raw[loop] < origin[loop].min) {
+                                    raw[loop] = origin[loop].min;
+                                } else if (raw[loop] > origin[loop].max) {
+                                    if (type == 'hsv' && loop == 'h') {
+                                        raw[loop] = 0;
+                                    } else {
+                                        raw[loop] = origin[loop].max;
+                                    }
+                                }
+                            }
+                        break;
+
+                        case 'hex':
+                            check = pttp._human[raw.toLowerCase()];
+
+                            if (check) {
+                                raw = check;
+                            } else {
+                                raw  = ('' + raw)
+                                       .toUpperCase()
+                                       .replace(/^#/g, '')
+                                       .replace(/[^A-F0-9]/g, '0');
+                                loop = raw.length;
+
+                                if (loop < 6 && loop > 3) {
+                                    raw += ('000000').substring(loop, 6 - loop);
+                                } else if (loop < 6 && loop < 3) {
+                                    raw += ('000').substring(loop, 3 - loop);
+                                } else if (loop > 6) {
+                                    raw = raw.substring(0, 6);
+                                }
+                            }
+                        break;
+
+                    }
+
+                    if (object) {
+                        return {
+                            type : type,
+                            raw  : raw
+                        };
+                    }
+
+                    return raw;
                 }
 
-                for (alias in color) {
-                    inverted[alias] = 255 - color[alias];
-                }
-
-                if (out) {
-                    inverted = Color.prototype['_rgb2' + out](inverted);
-                }
-
-                return inverted;
+                return false;
             },
             /**
-             * Set all color formats from from RGB or get current value
-             * of the ._rgb property
+             * Convert a given color into needed format
              *
              * @this    {Color}
-             * @param   {Boolean|Object}
-             * @returns {Color|Object}
+             * @param   {String|Object}
+             * @param   {String}
+             * @returns {String|Object}
              */
-            rgb : function(raw) {
-                raw = raw || false;
-
-                if (typeof raw == 'object') {
-                    raw.r = raw.r || 0;
-                    raw.g = raw.g || 0;
-                    raw.b = raw.b || 0;
-
-                    //
-                    this._rgb = this.validate(raw, 'rgb');
-                    this._hsb = this.convert('rgb', 'hsb');
-                    this._hex = this.convert('rgb', 'hex');
-                } else {
-                    return this._rgb;
-                }
-
-                return this;
-            },
-            /**
-             * Set all color formats from from HSB or get current value
-             * of the ._hsb property
-             *
-             * @this    {Color}
-             * @param   {Boolean|Object}
-             * @returns {Color|Object}
-             */
-            hsb : function(raw) {
-                raw = raw || false;
-
-                if (typeof raw == 'object') {
-                    raw.h = raw.h || 0;
-                    raw.s = raw.s || 0;
-                    raw.b = raw.b || 0;
-
-                    //
-                    this._hsb = this.validate(raw, 'hsb');
-                    this._rgb = this.convert('hsb', 'rgb');
-                    this._hex = this.convert('rgb', 'hex');
-                } else {
-                    return this._hsb;
-                }
-
-                return this;
-            },
-            /**
-             * Set all color formats from from HEX or get current value
-             * of the ._hex property
-             *
-             * @this    {Color}
-             * @param   {Boolean|Object}
-             * @returns {Color|String}
-             */
-            hex : function(raw) {
-                raw = raw || false;
+             convert : function(raw, out) {
+                out = out || 'rgb';
 
                 var
-                    check = typeof raw;
+                    alias = '',
+                    pttp  = Color.prototype,
+                    valid = pttp.validate(raw, true);
 
-                if (check == 'number' || check == 'string') {
-                    //
-                    this._hex = this.validate(raw, 'hex');
-                    this._rgb = this.convert('hex', 'rgb');
-                    this._hsb = this.convert('rgb', 'hsb');
-                } else {
-                    return this._hex;
+                if (valid) {
+                    alias = '_' + valid.type + '2' + out;
+
+                    if (pttp[alias]) {
+                        return pttp[alias](valid.raw);
+                    }
                 }
 
-                return this;
-            }
+                return false;
+             }
         };
 
         /**
-         * Link to Color.prototype.convert for a static usage
+         * Static links to prototype methods
          *
          * @static
-         *
-         * @this    {Color}
-         * @param   {String}
-         * @param   {String}
-         * @param   {Boolean|String|Object}
-         * @returns {String|Object}
          */
-        Color.convert = Color.prototype.convert;
-
-        /**
-         * Link to Color.prototype.invert for a static usage
-         *
-         * @static
-         *
-         * @this    {Color}
-         * @param   {String}
-         * @param   {String}
-         * @param   {Boolean|String|Object}
-         * @returns {String|Object}
-         */
-        Color.invert = Color.prototype.invert;
-
-        /**
-         * Link to Color.prototype.convert for a static usage
-         *
-         * @static
-         *
-         * @this    {Color}
-         * @param   {String|Object}
-         * @param   {Boolean|String}
-         * @returns {String|Object}
-         */
+        Color.type     = Color.prototype.type;
+        Color.convert  = Color.prototype.convert;
         Color.validate = Color.prototype.validate;
 
 
-        /**
-         * Link to Color.prototype.type for a static usage
-         *
-         * @static
-         *
-         * @this    {Color}
-         * @param   {String|Object}
-         * @returns {String|Object}
-         */
-        Color.type = Color.prototype.type;
-
-
-    // To global namespace
+    // Appear in the given namespace
     target.Color = Color;
 
 
-// If you want to chage context for Color library,
+// If you wish to chage context for Color library,
 // change it here
 })(window);
