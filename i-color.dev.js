@@ -989,11 +989,6 @@
     // Appear in the given namespace
     target.Color = Color;
 
-    var
-        tmp1 = Color.convert('C00'),
-        tmp2 = Color.convert(tmp1, 'cmyk');
-console.log(tmp1);
-console.log(tmp2);
 
 // If you wish to chage context for Color library,
 // change it here
