@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
     i-color, simple JavaScript library for HEX/RGB/HSV/LAB/XYZ colors based on algorithms from EasyRGB (http://www.easyrgb.com/index.php?X=MATH).
 
 
@@ -121,4 +119,3 @@
            | — lab
            | — xyz
     =============================================================
->>>>>>> Added the description
