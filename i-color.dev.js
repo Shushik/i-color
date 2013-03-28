@@ -714,7 +714,7 @@
                 var
                     pttp = Color.prototype,
                     rgb  = pttp._lab2rgb(raw);
-
+console.log(rgb);
                 return pttp._rgb2hex(rgb);
             },
             /**
@@ -742,6 +742,10 @@
 
                 for (loop in rgb) {
                     rgb[loop] = Color.prototype._round(rgb[loop]);
+
+                    if (rgb[loop] < 0) {
+                        rgb[loop] = 0;
+                    }
 
                     if (rgb[loop] > 0.0031308) {
                         rgb[loop] = 1.055 * Math.pow(rgb[loop], (1 / 2.4)) - 0.055;
