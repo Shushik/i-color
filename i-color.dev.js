@@ -714,7 +714,7 @@
                 var
                     pttp = Color.prototype,
                     rgb  = pttp._lab2rgb(raw);
-console.log(rgb);
+
                 return pttp._rgb2hex(rgb);
             },
             /**
