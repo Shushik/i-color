@@ -514,10 +514,10 @@
                     };
 
                 if (s == 0) {
-                    if (b == 0) {
+                    if (v == 0) {
                         rgb.r = rgb.g = rgb.b = 0;
                     } else {
-                        rgb.r = rgb.g = rgb.b = parseInt(b * 255 / 100);
+                        rgb.r = rgb.g = rgb.b = parseInt(v * 255 / 100);
                     }
                 } else {
                     if (h == 360) {
