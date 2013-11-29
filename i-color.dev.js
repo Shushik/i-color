@@ -482,7 +482,7 @@
 
                 for (loop in tmp) {
                     if (tmp[loop].length < 2) {
-                        tmp[loop] += tmp[loop];
+                        tmp[loop] = '0'+tmp[loop];
                     }
                 }
 
