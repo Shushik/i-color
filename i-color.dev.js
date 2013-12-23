@@ -256,7 +256,8 @@
              */
             _round : function(num, after) {
                 after = after || 3;
-
+                //Exponent notations wont work with regex - so use toFixed first
+                num = num.toFixed(after+1);
                 var
                     reg = new RegExp('^([-\\d]*)(\\.\\d{1,' + after + '})?.*');
 
@@ -902,7 +903,8 @@
                         case 'xyz':
                         case 'cmyk':
                             for (loop in origin) {
-                                if (!raw[loop] || raw[loop] < origin[loop].min) {
+                                //if raw[loop] is empty or less than min - set it to min
+                                if ((!raw[loop] && raw[loop] !== 0) || raw[loop] < origin[loop].min) {
                                     raw[loop] = origin[loop].min;
                                 } else if (raw[loop] > origin[loop].max) {
                                     if (type == 'hsv' && loop == 'h') {
