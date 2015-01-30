@@ -1465,7 +1465,9 @@ IColor.XYZ = IColor.XYZ || (function() {
     }
 
     /**
-     * Get the white point (http://courses.graphicon.ru/files/courses/imagesynt/2011/lectures/mis_lect04_11.pdf)
+     * Get the white point
+     *
+     * @todo allow to reset the white point (http://courses.graphicon.ru/files/courses/imagesynt/2011/lectures/mis_lect04_11.pdf)
      *
      * @static
      *
