@@ -69,7 +69,7 @@
 
     <code>
         // Get an inverted color
-        IColor.invert('purple'); // {r=127, g=255, b=127}
+        IColor.invert('purple'); // {r : 127, g : 255, b : 127}
         IColor.convert({w : -1, u : 0, t : 1}); // null
     </code>
 
@@ -135,10 +135,10 @@
         var
             hex = IColor.HEX({l : 90, a : -7, b : -14}); // c4e8fd
 
-        console.log(IColor.HEX.HSV(hex));
-        console.log(IColor.HEX.LAB(hex));
-        console.log(IColor.HEX.RGB(hex));
-        console.log(IColor.HEX.XYZ(hex));
+        console.log(IColor.HEX.HSV(hex)); // {h : 202, s : 22, v : 99}
+        console.log(IColor.HEX.LAB(hex)); // {l : 90.10993126375871, a : -7.236782475735282, b : -14.045914504138924}
+        console.log(IColor.HEX.RGB(hex)); // {r : 196, g : 232, b : 253}
+        console.log(IColor.HEX.XYZ(hex)); // {x : 69.351, y : 76.541, z : 104.047}
     </code>
 
 
@@ -201,12 +201,12 @@
 
     <code>
         var
-            hsv = IColor.HSV({r : 60, g : 177, b : 74}); // {h=127, s=66, v=69}
+            hsv = IColor.HSV({r : 60, g : 177, b : 74}); // {h : 127, s : 66, v : 69}
 
-        console.log(IColor.HSV.HEX(hsv));
-        console.log(IColor.HSV.LAB(hsv));
-        console.log(IColor.HSV.RGB(hsv));
-        console.log(IColor.HSV.XYZ(hsv));
+        console.log(IColor.HSV.HEX(hsv)); // 3baf49
+        console.log(IColor.HSV.LAB(hsv)); // {l : 63.40152125453656, a : -53.34049165482646, b : 42.28662758199467}
+        console.log(IColor.HSV.RGB(hsv)); // {r : 59, g : 175, b : 73}
+        console.log(IColor.HSV.XYZ(hsv)); // {x : 18.336, y : 32.071, z : 11.527}
     </code>
 
 
@@ -242,12 +242,12 @@
 
     <code>
         var
-            lab = IColor.LAB('antiquewhite'); // {l=93.73079174967708, a=1.8418379936777085, b=11.517150228348449}
+            lab = IColor.LAB('antiquewhite'); // {l : 93.73079174967708, a : 1.8418379936777085, b : 11.517150228348449}
 
-        console.log(IColor.LAB.HEX(lab));
-        console.log(IColor.LAB.HSV(lab));
-        console.log(IColor.LAB.RGB(lab));
-        console.log(IColor.LAB.XYZ(lab));
+        console.log(IColor.LAB.HEX(lab)); // faebd7
+        console.log(IColor.LAB.HSV(lab)); // {h : 34, s : 13, v : 98}
+        console.log(IColor.LAB.RGB(lab)); // {r : 250, g : 235, b : 215}
+        console.log(IColor.LAB.XYZ(lab)); // {x : 81.4, y : 84.6, z : 76.3}
     </code>
 
 
@@ -283,12 +283,12 @@
 
     <code>
         var
-            rgb = IColor.RGB({l : 93.73079174967708, a : 1.8418379936777085, b : 11.517150228348449}); // {r=250, g=235, b=215}
+            rgb = IColor.RGB({l : 93.73079174967708, a : 1.8418379936777085, b : 11.517150228348449}); // {r : 250, g : 235, b : 215}
 
-        console.log(IColor.RGB.HEX(rgb));
-        console.log(IColor.RGB.HSV(rgb));
-        console.log(IColor.RGB.LAB(rgb));
-        console.log(IColor.RGB.XYZ(rgb));
+        console.log(IColor.RGB.HEX(rgb)); // faebd7
+        console.log(IColor.RGB.HSV(rgb)); // {h : 34, s : 13, v : 98}
+        console.log(IColor.RGB.LAB(rgb)); // {l : 93.73079174967708, a : 1.8418379936777085, b : 11.517150228348449}
+        console.log(IColor.RGB.XYZ(rgb)); // {x : 81.398, y : 84.647, z : 76.338}
     </code>
 
 
@@ -324,12 +324,12 @@
 
     <code>
         var
-            xyz = IColor.XYZ('#FACE8D'); // {x=66.303, y=66.39, z=34.519}
+            xyz = IColor.XYZ('#FACE8D'); // {x : 66.303, y : 66.39, z : 34.519}
 
-        console.log(IColor.XYZ.HEX(xyz));
-        console.log(IColor.XYZ.HSV(xyz));
-        console.log(IColor.XYZ.LAB(xyz));
-        console.log(IColor.XYZ.RGB(xyz));
+        console.log(IColor.XYZ.HEX(xyz)); // face8d
+        console.log(IColor.XYZ.HSV(xyz)); // {h : 35, s : 43, v : 98}
+        console.log(IColor.XYZ.LAB(xyz)); // {l : 85.19495899942261, a : 7.254893813334773, b : 38.10076041491617}
+        console.log(IColor.XYZ.RGB(xyz)); // {r : 250, g : 206, b : 141}
     </code>
 
 

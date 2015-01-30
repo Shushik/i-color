@@ -191,13 +191,12 @@ var IColor = IColor || (function() {
     /**
      * Get the correct color format
      *
-     * @param {object}            raw
-     * @param {string}            keys
-     * @param {undefined|boolean} _tech
+     * @param {object} raw
+     * @param {string} keys
      *
      * @return {object}
      */
-    self.correct = function(raw, keys, _tech) {
+    self.correct = function(raw, keys) {
         // No raw, no result
         if (raw === undefined) {
             return null;
@@ -235,11 +234,6 @@ var IColor = IColor || (function() {
             }
 
             clean[alias] = piece;
-        }
-
-        // 
-        if (_tech === true) {
-            self[type]._raw = clean;
         }
 
         return clean;
@@ -309,16 +303,6 @@ IColor.HEX = IColor.HEX || (function() {
         self(raw) {
             return self.parent.convert(raw, 'HEX');
         }
-
-    /**
-     * Common format raw
-     *
-     * @static
-     * @private
-     *
-     * @type {string}
-     */
-    self._raw = '';
 
     /**
      * Colors by keywords
@@ -409,9 +393,7 @@ IColor.HEX = IColor.HEX || (function() {
      * @return {object}
      */
     self.HSV = function(raw) {
-        self.correct(raw);
-
-        return self.parent.RGB.HSV(self.RGB());
+        return self.parent.RGB.HSV(self.RGB(raw));
     }
 
     /**
@@ -424,9 +406,7 @@ IColor.HEX = IColor.HEX || (function() {
      * @return {object}
      */
     self.LAB = function(raw) {
-        self.correct(raw);
-
-        return self.parent.XYZ.LAB(self.XYZ());
+        return self.parent.XYZ.LAB(self.XYZ(raw));
     }
 
     /**
@@ -439,23 +419,22 @@ IColor.HEX = IColor.HEX || (function() {
      * @return {object}
      */
     self.RGB = function(raw) {
-        self.correct(raw);
-
         var
-            rgb = {
-                r : 0,
-                g : 0,
-                b : 0
-            };
+            rgb   = {
+                        r : 0,
+                        g : 0,
+                        b : 0
+                    },
+            clean = self.correct(raw);
 
-        if (self._raw.length == 3) {
-            rgb.r = parseInt((self._raw.substring(0, 1) + self._raw.substring(0, 1)), 16);
-            rgb.g = parseInt((self._raw.substring(1, 2) + self._raw.substring(1, 2)), 16);
-            rgb.b = parseInt((self._raw.substring(2, 3) + self._raw.substring(2, 3)), 16);
+        if (clean.length == 3) {
+            rgb.r = parseInt((clean.substring(0, 1) + clean.substring(0, 1)), 16);
+            rgb.g = parseInt((clean.substring(1, 2) + clean.substring(1, 2)), 16);
+            rgb.b = parseInt((clean.substring(2, 3) + clean.substring(2, 3)), 16);
         } else {
-            rgb.r = parseInt(self._raw.substring(0, 2), 16);
-            rgb.g = parseInt(self._raw.substring(2, 4), 16);
-            rgb.b = parseInt(self._raw.substring(4, 6), 16);
+            rgb.r = parseInt(clean.substring(0, 2), 16);
+            rgb.g = parseInt(clean.substring(2, 4), 16);
+            rgb.b = parseInt(clean.substring(4, 6), 16);
         }
 
         return rgb;
@@ -471,9 +450,7 @@ IColor.HEX = IColor.HEX || (function() {
      * @return {object}
      */
     self.XYZ = function(raw) {
-        self.correct(raw);
-
-        return self.parent.RGB.XYZ(self.RGB());
+        return self.parent.RGB.XYZ(self.RGB(raw));
     }
 
     /**
@@ -539,8 +516,6 @@ IColor.HEX = IColor.HEX || (function() {
 
         // Get by a keyword
         if (human = self.human(keyword)) {
-            self._raw = human;
-
             return human;
         }
 
@@ -556,8 +531,6 @@ IColor.HEX = IColor.HEX || (function() {
         } else if (length < 3) {
             keyword += ('000').substring(length, 3 - length);
         }
-
-        self._raw = keyword;
 
         return keyword;
     }
@@ -595,16 +568,6 @@ IColor.HSV = IColor.HSV || (function() {
         self(raw) {
             return self.parent.convert(raw, 'HSV');
         }
-
-    /**
-     * Common format raw
-     *
-     * @static
-     * @private
-     *
-     * @type {string}
-     */
-    self._raw = null;
 
     /**
      * H minimum and maximum values
@@ -659,9 +622,7 @@ IColor.HSV = IColor.HSV || (function() {
      * @return {object}
      */
     self.HEX = function(raw) {
-        self.correct(raw);
-
-        return self.parent.RGB.HEX(self.RGB());
+        return self.parent.RGB.HEX(self.RGB(raw));
     }
 
     /**
@@ -672,9 +633,7 @@ IColor.HSV = IColor.HSV || (function() {
      * @return {object}
      */
     self.LAB = function(raw) {
-        self.correct(raw);
-
-        return self.parent.XYZ.LAB(self.XYZ());
+        return self.parent.XYZ.LAB(self.XYZ(raw));
     }
 
     /**
@@ -685,18 +644,17 @@ IColor.HSV = IColor.HSV || (function() {
      * @return {object}
      */
     self.RGB = function(raw) {
-        self.correct(raw);
-
         var
-            i   = 0,
-            f   = 0,
-            p   = 0,
-            q   = 0,
-            t   = 0,
-            h   = self._raw.h,
-            s   = self._raw.s,
-            v   = self._raw.v,
-            rgb = {
+            i     = 0,
+            f     = 0,
+            p     = 0,
+            q     = 0,
+            t     = 0,
+            clean = self.correct(raw),
+            h     = clean.h,
+            s     = clean.s,
+            v     = clean.v,
+            rgb   = {
                 r : 0,
                 g : 0,
                 b : 0
@@ -780,9 +738,7 @@ IColor.HSV = IColor.HSV || (function() {
      * @return {object}
      */
     self.XYZ = function(raw) {
-        self.correct(raw);
-
-        return self.parent.RGB.XYZ(self.RGB());
+        return self.parent.RGB.XYZ(self.RGB(raw));
     }
 
     /**
@@ -844,16 +800,6 @@ IColor.LAB = IColor.LAB || (function() {
         }
 
     /**
-     * Common format raw
-     *
-     * @static
-     * @private
-     *
-     * @type {string}
-     */
-    self._raw = null;
-
-    /**
      * A minimum and maximum values
      *
      * @static
@@ -906,9 +852,7 @@ IColor.LAB = IColor.LAB || (function() {
      * @return {object}
      */
     self.HEX = function(raw) {
-        self.correct(raw);
-
-        return self.parent.RGB.HEX(self.RGB());
+        return self.parent.RGB.HEX(self.RGB(raw));
     }
 
     /**
@@ -919,9 +863,7 @@ IColor.LAB = IColor.LAB || (function() {
      * @return {object}
      */
     self.HSV = function(raw) {
-        self.correct(raw);
-
-        return self.parent.RGB.HSV(self.RGB());
+        return self.parent.RGB.HSV(self.RGB(raw));
     }
 
     /**
@@ -932,9 +874,7 @@ IColor.LAB = IColor.LAB || (function() {
      * @return {object}
      */
     self.RGB = function(raw) {
-        self.correct(raw);
-
-        return self.parent.XYZ.RGB(self.XYZ());
+        return self.parent.XYZ.RGB(self.XYZ(raw));
     }
 
     /**
@@ -945,18 +885,17 @@ IColor.LAB = IColor.LAB || (function() {
      * @return {object}
      */
     self.XYZ = function(raw) {
-        self.correct(raw);
-
         var
             powed = 0,
             alias = '',
             xyz   = {},
+            clean = self.correct(raw),
             white = self.parent.XYZ.white();
 
         // 
-        xyz.y = (self._raw.l + 16) / 116;
-        xyz.x = self._raw.a / 500 + xyz.y;
-        xyz.z = xyz.y - self._raw.b / 200;
+        xyz.y = (clean.l + 16) / 116;
+        xyz.x = clean.a / 500 + xyz.y;
+        xyz.z = xyz.y - clean.b / 200;
 
         // 
         for (alias in xyz) {
@@ -1033,16 +972,6 @@ IColor.RGB = IColor.RGB || (function() {
         }
 
     /**
-     * Common format raw
-     *
-     * @static
-     * @private
-     *
-     * @type {string}
-     */
-    self._raw = null;
-
-    /**
      * B minimum and maximum values
      *
      * @static
@@ -1095,16 +1024,15 @@ IColor.RGB = IColor.RGB || (function() {
      * @return {object}
      */
     self.HEX = function(raw) {
-        self.correct(raw);
-
         var
-            loop = '',
-            tmp  = {};
+            loop  = '',
+            tmp   = {},
+            clean = self.correct(raw);
 
         // 
-        tmp.r = self._raw.r.toString(16),
-        tmp.g = self._raw.g.toString(16),
-        tmp.b = self._raw.b.toString(16);
+        tmp.r = clean.r.toString(16),
+        tmp.g = clean.g.toString(16),
+        tmp.b = clean.b.toString(16);
 
         // 
         for (loop in tmp) {
@@ -1124,20 +1052,23 @@ IColor.RGB = IColor.RGB || (function() {
      * @return {object}
      */
     self.HSV = function(raw) {
-        self.correct(raw);
-
         var
-            r     = self._raw.r / 255,
-            g     = self._raw.g / 255,
-            b     = self._raw.b / 255,
+            r     = 0,
+            g     = 0,
+            b     = 0,
             min   = 0,
             max   = 0,
             delta = 0,
             hsv   = {
-                h : 0,
-                s : 0,
-                v : 0
-            };
+                        h : 0,
+                        s : 0,
+                        v : 0
+                    },
+            clean = self.correct(raw);
+
+        r = clean.r / 255;
+        g = clean.g / 255;
+        b = clean.b / 255;
 
         // 
         if (r >= g && r >= g) {
@@ -1190,9 +1121,7 @@ IColor.RGB = IColor.RGB || (function() {
      * @return {object}
      */
     self.LAB = function(raw) {
-        self.correct(raw);
-
-        return self.parent.XYZ.LAB(self.XYZ());
+        return self.parent.XYZ.LAB(self.XYZ(raw));
     }
 
     /**
@@ -1203,17 +1132,19 @@ IColor.RGB = IColor.RGB || (function() {
      * @return {object}
      */
     self.XYZ = function(raw) {
-        self.correct(raw);
-
         var
-            tmp  = '',
-            loop = '',
-            rgb  = {
-                r : self._raw.r / 255,
-                g : self._raw.g / 255,
-                b : self._raw.b / 255
-            },
-            xyz  = null;
+            tmp   = '',
+            loop  = '',
+            rgb   = null,
+            xyz   = null,
+            clean = self.correct(raw);;
+
+        //
+        rgb = {
+            r : clean.r / 255,
+            g : clean.g / 255,
+            b : clean.b / 255
+        }
 
         // 
         for (loop in rgb) {
@@ -1300,16 +1231,6 @@ IColor.XYZ = IColor.XYZ || (function() {
         }
 
     /**
-     * Common format raw
-     *
-     * @static
-     * @private
-     *
-     * @type {string}
-     */
-    self._raw = null;
-
-    /**
      * X minimum and maximum values
      *
      * @static
@@ -1361,10 +1282,8 @@ IColor.XYZ = IColor.XYZ || (function() {
      *
      * @return {object}
      */
-    self.HSV = function(raw) {
-        self.correct(raw);
-
-        return self.parent.RGB.HEX(self.RGB());
+    self.HEX = function(raw) {
+        return self.parent.RGB.HEX(self.RGB(raw));
     }
 
     /**
@@ -1375,9 +1294,7 @@ IColor.XYZ = IColor.XYZ || (function() {
      * @return {object}
      */
     self.HSV = function(raw) {
-        self.correct(raw);
-
-        return self.parent.RGB.HSV(self.RGB());
+        return self.parent.RGB.HSV(self.RGB(raw));
     }
 
     /**
@@ -1388,15 +1305,15 @@ IColor.XYZ = IColor.XYZ || (function() {
      * @return {object}
      */
     self.LAB = function(raw) {
-        self.correct(raw);
 
         var
             loop  = '',
             xyz   = {},
+            clean = self.correct(raw),
             white = self.white();
 
-        for (loop in self._raw) {
-            xyz[loop] = self._raw[loop] / white[loop];
+        for (loop in clean) {
+            xyz[loop] = clean[loop] / white[loop];
 
             if (xyz[loop] > 0.008856) {
                 xyz[loop] = Math.pow(xyz[loop], 1 / 3);
@@ -1420,21 +1337,25 @@ IColor.XYZ = IColor.XYZ || (function() {
      * @return {object}
      */
     self.RGB = function(raw) {
-        self.correct(raw);
-
         var
             loop = '',
-            xyz  = {
-                x : self._raw.x / 100,
-                y : self._raw.y / 100,
-                z : self._raw.z / 100
-            },
-            rgb  = {};
+            xyz  = null,
+            rgb  = null,
+            clean = self.correct(raw);
 
-        // 
-        rgb.r = xyz.x * 3.2406 + xyz.y * -1.5372 + xyz.z * -0.4986;
-        rgb.g = xyz.x * -0.9689 + xyz.y * 1.8758 + xyz.z * 0.0415;
-        rgb.b = xyz.x * 0.0557 + xyz.y * -0.2040 + xyz.z * 1.0570;
+        //
+        xyz = {
+            x : clean.x / 100,
+            y : clean.y / 100,
+            z : clean.z / 100
+        };
+
+        //
+        rgb = { 
+            r : xyz.x * 3.2406 + xyz.y * -1.5372 + xyz.z * -0.4986,
+            g : xyz.x * -0.9689 + xyz.y * 1.8758 + xyz.z * 0.0415,
+            b : xyz.x * 0.0557 + xyz.y * -0.2040 + xyz.z * 1.0570
+        }
 
         // 
         for (loop in rgb) {
