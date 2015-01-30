@@ -498,17 +498,22 @@ IColor.HEX = IColor.HEX || (function() {
     /**
      * Get a HEX color by a keyword from self._human
      *
-     * @param {string} keyword
+     * @param {string}           keyword
+     * @param {undefined|string} color
      *
      * @return {string|object}
      */
-    self.human = function(keyword) {
+    self.human = function(keyword, color) {
         var
             clean = keyword.replace(/[^a-z0-9]/ig, '').toLowerCase(),
-            found = self._human.match(new RegExp(clean + ':([^,]{6})'));
+            found = null;
 
-        if (found) {
-            return found[1];
+        if (self.check(color)) {
+            self._human += ',' + keyword + ':' + self.correct(color);
+        } else {
+            if (found = self._human.match(new RegExp(clean + ':([^,]{6})'))) {
+                return found[1];
+            }
         }
 
         return null;

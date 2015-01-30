@@ -1,6 +1,7 @@
     i-color, simple JavaScript library for HEX/RGB/HSV/LAB/XYZ colors based on algorithms from EasyRGB (http://www.easyrgb.com/index.php?X=MATH).
 
 
+
     Goods:
 
     — simple syntax;
@@ -90,7 +91,7 @@
 
     <code>
         // Get a color in chosen format
-        IColor.convert({l : 90, a : -7, b : -14}, 'HEX');
+        IColor.convert({l : 90, a : -7, b : -14}, 'HEX'); // c4e8fd
         IColor.convert({w : -1, u : 0, t : 1}); // null
     </code>
 
@@ -170,7 +171,6 @@
 
 
 
-
     IColor.HEX.human():
 
     <code>
@@ -178,6 +178,13 @@
         console.log(IColor.HEX.human('seagreen')); // 2E8B57
         console.log(IColor.HEX.human('light goldenrod yellow')); // FAFAD2
         console.log(IColor.HEX.human('trololo')); // null
+    </code>
+
+    <code>
+        // Set a new HEX formatted color in vocabulary
+        console.log(IColor.HEX.human('trololo')); // null
+        console.log(IColor.HEX.human('trololo', 'FACE8D'));
+        console.log(IColor.HEX.human('trololo')); // 'face8d'
     </code>
 
 
