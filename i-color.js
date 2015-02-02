@@ -118,7 +118,9 @@ var IColor = IColor || (function() {
      * @return {number}
      */
     self.round = function(num, to) {
-        to = to || 1;
+        if (typeof to != 'number' || to < 0) {
+            return num;
+        }
 
         var
             pow = Math.pow(10, to);
@@ -388,7 +390,7 @@ IColor.HEX = IColor.HEX || (function() {
      *
      * @static
      *
-     * @param {undefined|string} raw
+     * @param {string} raw
      *
      * @return {object}
      */
@@ -401,12 +403,13 @@ IColor.HEX = IColor.HEX || (function() {
      * 
      * @static
      *
-     * @param {undefined|string} raw
+     * @param {string}           raw
+     * @param {undefined|number} rnd
      *
      * @return {object}
      */
-    self.LAB = function(raw) {
-        return self.parent.XYZ.LAB(self.XYZ(raw));
+    self.LAB = function(raw, rnd) {
+        return self.parent.XYZ.LAB(self.XYZ(raw), rnd);
     }
 
     /**
@@ -414,7 +417,7 @@ IColor.HEX = IColor.HEX || (function() {
      *
      * @static
      *
-     * @param {undefined|string} raw
+     * @param {string} raw
      *
      * @return {object}
      */
@@ -445,12 +448,13 @@ IColor.HEX = IColor.HEX || (function() {
      *
      * @static
      *
-     * @param {undefined|string} raw
+     * @param {string}           raw
+     * @param {undefined|number} rnd
      *
      * @return {object}
      */
-    self.XYZ = function(raw) {
-        return self.parent.RGB.XYZ(self.RGB(raw));
+    self.XYZ = function(raw, rnd) {
+        return self.parent.RGB.XYZ(self.RGB(raw), rnd);
     }
 
     /**
@@ -458,7 +462,7 @@ IColor.HEX = IColor.HEX || (function() {
      *
      * @static
      *
-     * @param {string|object} raw
+     * @param {object} raw
      *
      * @return {boolean}
      */
@@ -617,7 +621,7 @@ IColor.HSV = IColor.HSV || (function() {
     /**
      * HSV > HEX
      *
-     * @param {undefined|object} raw
+     * @param {object} raw
      *
      * @return {object}
      */
@@ -628,18 +632,19 @@ IColor.HSV = IColor.HSV || (function() {
     /**
      * HSV > LAB
      *
-     * @param {undefined|object} raw
+     * @param {object}           raw
+     * @param {undefined|number} rnd
      *
      * @return {object}
      */
-    self.LAB = function(raw) {
-        return self.parent.XYZ.LAB(self.XYZ(raw));
+    self.LAB = function(raw, rnd) {
+        return self.parent.XYZ.LAB(self.XYZ(raw), rnd);
     }
 
     /**
      * HSV > RGB
      *
-     * @param {undefined|object} raw
+     * @param {object} raw
      *
      * @return {object}
      */
@@ -733,12 +738,13 @@ IColor.HSV = IColor.HSV || (function() {
     /**
      * HSV > XYZ
      *
-     * @param {undefined|object} raw
+     * @param {object}           raw
+     * @param {undefined|number} rnd
      *
      * @return {object}
      */
-    self.XYZ = function(raw) {
-        return self.parent.RGB.XYZ(self.RGB(raw));
+    self.XYZ = function(raw, rnd) {
+        return self.parent.RGB.XYZ(self.RGB(raw), rnd);
     }
 
     /**
@@ -847,7 +853,7 @@ IColor.LAB = IColor.LAB || (function() {
     /**
      * LAB > HEX
      *
-     * @param {undefined|object} raw
+     * @param {object} raw
      *
      * @return {object}
      */
@@ -858,7 +864,7 @@ IColor.LAB = IColor.LAB || (function() {
     /**
      * LAB > HSV
      *
-     * @param {undefined|object} raw
+     * @param {object} raw
      *
      * @return {object}
      */
@@ -869,7 +875,7 @@ IColor.LAB = IColor.LAB || (function() {
     /**
      * LAB > RGB
      *
-     * @param {undefined|object} raw
+     * @param {object} raw
      *
      * @return {object}
      */
@@ -880,11 +886,12 @@ IColor.LAB = IColor.LAB || (function() {
     /**
      * LAB > XYZ
      *
-     * @param {undefined|object} raw
+     * @param {object}           raw
+     * @param {undefined|number} rnd
      *
      * @return {object}
      */
-    self.XYZ = function(raw) {
+    self.XYZ = function(raw, rnd) {
         var
             powed = 0,
             alias = '',
@@ -907,7 +914,7 @@ IColor.LAB = IColor.LAB || (function() {
                 xyz[alias] = (xyz[alias] - 16 / 116) / 7.787;
             }
 
-            xyz[alias] = self.parent.round(xyz[alias] * white[alias]);
+            xyz[alias] = self.parent.round(xyz[alias] * white[alias], rnd);
         }
 
         return xyz;
@@ -1019,7 +1026,7 @@ IColor.RGB = IColor.RGB || (function() {
     /**
      * RGB > HEX
      *
-     * @param {undefined|object} raw
+     * @param {object} raw
      *
      * @return {object}
      */
@@ -1047,7 +1054,7 @@ IColor.RGB = IColor.RGB || (function() {
     /**
      * RGB > HSV
      *
-     * @param {undefined|object} raw
+     * @param {object} raw
      *
      * @return {object}
      */
@@ -1116,22 +1123,24 @@ IColor.RGB = IColor.RGB || (function() {
     /**
      * RGB > LAB
      *
-     * @param {undefined|object} raw
+     * @param {object}           raw
+     * @param {undefined|number} rnd
      *
      * @return {object}
      */
-    self.LAB = function(raw) {
-        return self.parent.XYZ.LAB(self.XYZ(raw));
+    self.LAB = function(raw, rnd) {
+        return self.parent.XYZ.LAB(self.XYZ(raw), rnd);
     }
 
     /**
      * RGB > XYZ
      *
-     * @param {undefined|object} raw
+     * @param {object}           raw
+     * @param {undefined|number} rnd
      *
      * @return {object}
      */
-    self.XYZ = function(raw) {
+    self.XYZ = function(raw, rnd) {
         var
             tmp   = '',
             loop  = '',
@@ -1166,7 +1175,7 @@ IColor.RGB = IColor.RGB || (function() {
 
         //
         for (loop in xyz) {
-            xyz[loop] = self.parent.round(xyz[loop], 3);
+            xyz[loop] = self.parent.round(xyz[loop], rnd);
         }
 
         return xyz;
@@ -1278,7 +1287,7 @@ IColor.XYZ = IColor.XYZ || (function() {
     /**
      * XYZ > HEX
      *
-     * @param {undefined|object} raw
+     * @param {object} raw
      *
      * @return {object}
      */
@@ -1289,7 +1298,7 @@ IColor.XYZ = IColor.XYZ || (function() {
     /**
      * XYZ > HSV
      *
-     * @param {undefined|object} raw
+     * @param {object} raw
      *
      * @return {object}
      */
@@ -1300,11 +1309,12 @@ IColor.XYZ = IColor.XYZ || (function() {
     /**
      * XYZ > LAB
      *
-     * @param {undefined|object} raw
+     * @param {object}           raw
+     * @param {undefined|number} rnd
      *
      * @return {object}
      */
-    self.LAB = function(raw) {
+    self.LAB = function(raw, rnd) {
 
         var
             loop  = '',
@@ -1323,20 +1333,21 @@ IColor.XYZ = IColor.XYZ || (function() {
         }
 
         return {
-            l : 116 * xyz.y - 16,
-            a : 500 * (xyz.x - xyz.y),
-            b : 200 * (xyz.y - xyz.z)
+            l : self.parent.round(116 * xyz.y - 16, rnd),
+            a : self.parent.round(500 * (xyz.x - xyz.y), rnd),
+            b : self.parent.round(200 * (xyz.y - xyz.z), rnd)
         };
     }
 
     /**
      * XYZ > RGB
      *
-     * @param {undefined|object} raw
+     * @param {object}           raw
+     * @param {undefined|number} rnd
      *
      * @return {object}
      */
-    self.RGB = function(raw) {
+    self.RGB = function(raw, rnd) {
         var
             loop = '',
             xyz  = null,
@@ -1359,7 +1370,7 @@ IColor.XYZ = IColor.XYZ || (function() {
 
         // 
         for (loop in rgb) {
-            rgb[loop] = self.parent.round(rgb[loop], 3);
+            rgb[loop] = self.parent.round(rgb[loop], rnd);
 
             if (rgb[loop] < 0) {
                 rgb[loop] = 0;
