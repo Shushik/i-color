@@ -1058,67 +1058,62 @@ IColor.RGB = IColor.RGB || (function() {
      *
      * @return {object}
      */
-    self.HSV = function(raw) {
-        var
-            r     = 0,
-            g     = 0,
-            b     = 0,
-            min   = 0,
-            max   = 0,
-            delta = 0,
-            hsv   = {
-                        h : 0,
-                        s : 0,
-                        v : 0
-                    },
-            clean = self.correct(raw);
-
-        r = clean.r / 255;
-        g = clean.g / 255;
-        b = clean.b / 255;
-
-        // 
-        if (r >= g && r >= g) {
-            max = r;
-            min = g > b ? b : g;
-        } else if (g >= b && g >= r) {
-            max = g;
-            min = r > b ? b : r;
-        } else {
-            max = b;
-            min = g > r ? r : g;
+    self.HSV = function (raw) {
+      
+      var r = 0,
+        g = 0,
+        b = 0,
+        min = 0,
+        max = 0,
+        delta = 0,
+        hsv = {
+          h: 0,
+          s: 0,
+          v: 0
+        },
+        clean = self.correct(raw);
+      
+      r = clean.r / 255;
+      g = clean.g / 255;
+      b = clean.b / 255;
+      
+      
+      var rr, gg, bb,
+        h, s,
+        v = Math.max(r, g, b),
+        diff = v - Math.min(r, g, b),
+        diffc = function (c) {
+          return (v - c) / 6 / diff + 1 / 2;
+        };
+      
+      if (diff == 0) {
+        h = s = 0;
+      } else {
+        s = diff / v;
+        rr = diffc(r);
+        gg = diffc(g);
+        bb = diffc(b);
+        
+        if (r === v) {
+          h = bb - gg;
+        } else if (g === v) {
+          h = (1 / 3) + rr - bb;
+        } else if (b === v) {
+          h = (2 / 3) + gg - rr;
         }
-
-        // 
-        hsv.v = max;
-        hsv.s = (max) ? ((max - min) / max) : 0;
-
-        // 
-        if (!hsv.s) {
-            hsv.h = 0;
-        } else {
-            delta = max - min;
-
-            if (r == max) {
-                hsv.h = (g - b) / delta;
-            } else if (g == max) {
-                hsv.h = 2 + (b - r) / delta;
-            } else {
-                hsv.h = 4 + (r - g) / delta;
-            }
-
-            hsv.h = parseInt(hsv.h * 60);
-
-            if (hsv.v < 0) {
-                hsv.v += 360;
-            }
+        if (h < 0) {
+          h += 1;
+        } else if (h > 1) {
+          h -= 1;
         }
-
-        hsv.s = parseInt(hsv.s * 100);
-        hsv.v = parseInt(hsv.v * 100);
-
-        return hsv;
-    }
+      }
+      
+      hsv.h = Math.round(h * 360);
+      hsv.s = Math.round(s * 100);
+      hsv.v = Math.round(v * 100);
+      
+      return hsv;
+    };
 
     /**
      * RGB > LAB
